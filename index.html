@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Học bá check xong tao block</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:url("received_1787795915193981.png") no-repeat center center fixed;
+    background-size:cover;
+    overflow-x:hidden;
+}
+
+#screen{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.55);
+    padding:20px;
+    color:white;
+}
+
+h1{
+    text-align:center;
+    font-size:40px;
+    text-shadow:0 0 15px hotpink;
+}
+
+.form-box{
+    max-width:420px;
+    margin:auto;
+    background:rgba(0,0,0,0.7);
+    padding:25px;
+    border-radius:20px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin:8px 0;
+    font-size:16px;
+    border-radius:10px;
+    border:none;
+}
+
+button{
+    width:100%;
+    padding:15px;
+    font-size:24px;
+    border:none;
+    border-radius:15px;
+    background:hotpink;
+    cursor:pointer;
+}
+
+#result{
+    margin-top:20px;
+    text-align:center;
+    font-size:34px;
+    font-weight:bold;
+}
+
+/* effects */
+.shake{animation:shake .4s}
+@keyframes shake{
+    0%{transform:translate(0)}
+    25%{transform:translate(-10px)}
+    50%{transform:translate(10px)}
+    75%{transform:translate(-10px)}
+    100%{transform:translate(0)}
+}
+.flash{animation:flash .2s infinite}
+@keyframes flash{
+    0%{background:black}
+    100%{background:white}
+}
+
+/* falling */
+.fall{
+    position:fixed;
+    top:-50px;
+    font-size:32px;
+    animation:fall linear forwards;
+}
+@keyframes fall{
+    to{
+        transform:translateY(110vh);
+        opacity:0;
+    }
+}
+
+/* volume */
+#volumeBox{
+    position:fixed;
+    right:15px;
+    bottom:20px;
+    display:flex;
+    gap:10px;
+    background:rgba(0,0,0,0.6);
+    padding:10px;
+    border-radius:20px;
+}
+#frog{font-size:28px}
+input[type=range]{width:120px}
+</style>
+</head>
+
+<body>
+<div id="screen">
+    <h1>Học bá check xong tao block</h1>
+
+    <div class="form-box">
+        <input id="a" type="number" step="0.1" placeholder="HS1 thứ nhất">
+        <input id="b" type="number" step="0.1" placeholder="HS1 thứ hai">
+        <input id="x" type="number" step="0.1" placeholder="HS1 thứ ba">
+        <input id="c" type="number" step="0.1" placeholder="Giữa kỳ">
+        <input id="d" type="number" step="0.1" placeholder="Cuối kỳ">
+
+        <button onclick="playMusic();check()">CHECK</button>
+        <div id="result"></div>
+    </div>
+</div>
+
+<audio id="bgm" loop>
+    <source src="558d58db26fb3edabfcd3fa94542f31b.mp3" type="audio/mpeg">
+</audio>
+
+<div id="volumeBox">
+    <span id="frog">🐸</span>
+    <input type="range" min="0" max="100" value="40" oninput="setVol(this.value)">
+</div>
+
+<script>
+const bgm=document.getElementById("bgm");
+bgm.volume=0.4;
+
+function playMusic(){
+    bgm.muted=false;
+    bgm.play().catch(()=>{});
+}
+
+document.body.addEventListener("click",function once(){
+    playMusic();
+    document.body.removeEventListener("click",once);
+});
+
+function setVol(v){ bgm.volume=v/100; }
+
+function rain(icon,amount,dur=4){
+    for(let i=0;i<amount;i++){
+        let e=document.createElement("div");
+        e.className="fall";
+        e.innerText=icon;
+        e.style.left=Math.random()*100+"vw";
+        e.style.animationDuration=dur+"s";
+        document.body.appendChild(e);
+        setTimeout(()=>e.remove(),dur*1000);
+    }
+}
+
+function rainTextSlow(text){
+    let words=text.split(" ");
+    words.forEach((w,i)=>{
+        let e=document.createElement("div");
+        e.className="fall";
+        e.innerText=w;
+        e.style.fontSize="30px";
+        e.style.left=(8+i*14)+"vw";
+        e.style.animationDuration=(6+Math.random()*2)+"s";
+        document.body.appendChild(e);
+        setTimeout(()=>e.remove(),9000);
+    });
+}
+
+document.querySelectorAll("input").forEach(inp=>{
+    inp.addEventListener("focus",()=>{
+        playMusic();
+        rain("👀",8,3);
+        rain("💩",8,3);
+    });
+    inp.addEventListener("input",()=>{
+        rain("👀",5,3);
+        rain("💩",5,3);
+    });
+});
+
+function check(){
+    let screen=document.getElementById("screen");
+    screen.classList.add("shake");
+    setTimeout(()=>screen.classList.remove("shake"),400);
+
+    let vals=["a","b","x","c","d"].map(i=>parseFloat(document.getElementById(i).value));
+    let [a,b,x,c,d]=vals;
+    let dtb=((a+b+x+c*2+d*3)/8).toFixed(1);
+    document.getElementById("result").innerText="ĐTB: "+dtb;
+
+    if(dtb < 5){
+        screen.classList.add("flash");
+        rain("💀",40,5);
+        setTimeout(()=>{
+            screen.classList.remove("flash");
+            rainTextSlow("MÀY ĂN TẾT KHÔNG NGON RỒI");
+        },1500);
+    }
+    else if(dtb >= 6.5 && dtb < 8){
+        rain("🦋",30,5);
+        rain("🦨",20,5);
+        rainTextSlow("HIẾU BỊ HÔI");
+    }
+    else if(dtb >= 8 && dtb < 9){
+        rain("🐧",40,5);
+        rainTextSlow("MÀY HỌC BÁ TÝ TAO BLOCK 🙊🙊");
+    }
+    else if(dtb >= 9){
+        rain("💢",60,5);
+        rainTextSlow("HỌC BÁ TAO LÓC RỒI ĐÓ");
+    }
+}
+</script>
+</body>
+  </html>
+
